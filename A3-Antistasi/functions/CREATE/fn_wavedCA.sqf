@@ -1,8 +1,7 @@
 if (!isServer and hasInterface) exitWith {};
-
+#include "..\..\Includes\common.inc"
+FIX_LINE_NUMBERS()
 private ["_posOrigin","_typeGroup","_nameOrigin","_markTsk","_wp1","_soldiers","_landpos","_pad","_vehiclesX","_wp0","_wp3","_wp4","_wp2","_groupX","_groups","_typeVehX","_vehicle","_heli","_heliCrew","_groupHeli","_pilots","_rnd","_resourcesAAF","_nVeh","_radiusX","_roads","_Vwp1","_road","_veh","_vehCrew","_groupVeh","_Vwp0","_size","_Hwp0","_groupX1","_uwp0","_tsk","_vehicle","_soldierX","_pilot","_mrkDestination","_posDestination","_prestigeCSAT","_mrkOrigin","_airportX","_nameDest","_timeX","_solMax","_nul","_costs","_typeX","_threatEvalAir","_threatEvalLand","_pos","_timeOut","_sideX","_waves","_countX","_tsk1","_spawnPoint","_vehPool", "_airportIndex"];
-
-private _fileName = "wavedCA";
 
 bigAttackInProgress = true;
 publicVariable "bigAttackInProgress";
@@ -139,9 +138,9 @@ call {
 	for "_i" from 1 to (_patrolHeliCount) do { _vehPoolAirTransport pushBack _typePatrolHeli };
 };
 
-[3, format ["Land vehicle pool: %1", _vehPoolLand], _filename] call A3A_fnc_log;
-[3, format ["Air transport pool: %1", _vehPoolAirTransport], _filename] call A3A_fnc_log;
-[3, format ["Air support pool: %1", _vehPoolAirSupport], _filename] call A3A_fnc_log;
+Debug_1("Land vehicle pool: %1", _vehPoolLand);
+Debug_1("Air transport pool: %1", _vehPoolAirTransport);
+Debug_1("Air support pool: %1", _vehPoolAirSupport);
 
 private _fnc_remUnitCount = {
 	private _unitCount = {(local _x) and (alive _x)} count allUnits;
@@ -170,7 +169,7 @@ while {(_waves > 0)} do
 	if (_firstWave) then { _nVeh = _nVeh + 2 };
     _nVeh = (round (_nVeh)) max 1;
 
-    [3, format ["Wave will contain %1 vehicles", _nVeh], _fileName] call A3A_fnc_log;
+    Debug_1("Wave will contain %1 vehicles", _nVeh);
 
 	_posOriginLand = [];
 	_pos = [];
@@ -181,7 +180,7 @@ while {(_waves > 0)} do
 		//Attempt land attack if origin is an airport in range
 		_airportIndex = airportsX find _mrkOrigin;
 		if (_airportIndex >= 0 and (_posOrigin distance _posDestination < distanceForLandAttack)
-			and ([_posOrigin, _posDestination] call A3A_fnc_isTheSameIsland)) then
+			and ([_posOrigin, _posDestination] call A3A_fnc_arePositionsConnected)) then
 		{
 			_spawnPoint = server getVariable (format ["spawn_%1", _mrkOrigin]);
 			_pos = getMarkerPos _spawnPoint;
@@ -194,7 +193,7 @@ while {(_waves > 0)} do
 			_outposts = outposts select {
 				(sidesX getVariable [_x,sideUnknown] == _sideX)
 				and (getMarkerPos _x distance _posDestination < distanceForLandAttack)
-				and {[_posDestination, getMarkerPos _x] call A3A_fnc_isTheSameIsland}
+				and {[_posDestination, getMarkerPos _x] call A3A_fnc_arePositionsConnected}
 				and {[_x,false] call A3A_fnc_airportCanAttack}			// checks idle, garrison size, spawndist2
 			};
 			if !(_outposts isEqualTo []) then
@@ -221,11 +220,11 @@ while {(_waves > 0)} do
 				_vehPoolLand append _typesTruck;
 				_vehPoolLand append _typesMRAP;
 				_waves = 0;
-				[2, "Attack ran out of land vehicles", _filename] call A3A_fnc_log;
+                Info("Attack ran out of land vehicles");
 			};
 			_typeVehX = selectRandom _vehPoolLand;
 			_vehPoolLand deleteAt (_vehPoolLand find _typeVehX);
-			[3, format ["Spawning vehicle type %1", _typeVehX], _filename] call A3A_fnc_log;
+            Debug_1("Spawning vehicle type %1", _typeVehX);
 
 			if (true) then
 			{
@@ -239,7 +238,7 @@ while {(_waves > 0)} do
 					sleep 1;
 				};
 				if (count _pos == 0) then {_pos = getMarkerPos _spawnPoint};
-				_vehicle=[_pos, _dir,_typeVehX, _sideX] call bis_fnc_spawnvehicle;
+				_vehicle=[_pos, _dir,_typeVehX, _sideX] call A3A_fnc_spawnVehicle;
 
 				_veh = _vehicle select 0;
 				_vehCrew = _vehicle select 1;
@@ -320,7 +319,7 @@ while {(_waves > 0)} do
 			};
 
 			if ((count _soldiers >= 10) && (call _fnc_remUnitCount < 5)) exitWith {
-				[2, format ["Ground wave reached maximum units count after %1 vehicles", _countX], _filename] call A3A_fnc_log;
+                Info_1("Ground wave reached maximum units count after %1 vehicles", _countX);
 			};
 			sleep 15;
 			_countX = _countX + 1;
@@ -328,7 +327,7 @@ while {(_waves > 0)} do
 	};
 
 	_isSea = false;
-	if (!hasIFA && (count seaAttackSpawn != 0)) then
+	if (!A3A_hasIFA && (count seaAttackSpawn != 0)) then
 		{
 		for "_i" from 0 to 3 do
 			{
@@ -382,7 +381,7 @@ while {(_waves > 0)} do
 					};
 				if ((count _landPos > 0) and _proceed) then
 					{
-					_vehicle=[_pos, random 360,_typeVehX, _sideX] call bis_fnc_spawnvehicle;
+					_vehicle=[_pos, random 360,_typeVehX, _sideX] call A3A_fnc_spawnVehicle;
 
 					_veh = _vehicle select 0;
 					_vehCrew = _vehicle select 1;
@@ -485,11 +484,11 @@ while {(_waves > 0)} do
 
 	// Fill air supports up to half wave size, minimum +1
 	private _countNewSupport = 1 max (floor (_nVeh / 2) - count _airSupport);
-	[3, format ["Spawning %1 new support aircraft", _countNewSupport], _filename] call A3A_fnc_log;
+    Debug_1("Spawning %1 new support aircraft", _countNewSupport);
 
 	if (_countNewSupport > count _vehPoolAirSupport) then {
 		_countNewSupport = count _vehPoolAirSupport;
-		[2, "Attack ran out of air supports", _filename] call A3A_fnc_log;
+        Info("Attack ran out of air supports");
 		_waves = 0;
 	};
 
@@ -503,7 +502,7 @@ while {(_waves > 0)} do
 		_airSupport pushBack _uav;
 		//[_uav,"UAV"] spawn A3A_fnc_inmuneConvoy;
 		[_uav,_mrkDestination,_sideX] spawn A3A_fnc_VANTinfo;
-		createVehicleCrew _uav;
+		[_sideX, _uav] call A3A_fnc_createVehicleCrew;
 		_pilots append (crew _uav);
 		_groupVeh = group driver _uav;
 		_groups pushBack _groupVeh;
@@ -513,7 +512,7 @@ while {(_waves > 0)} do
 		{[_x] call A3A_fnc_NATOinit} forEach (crew _uav);
 		[_uav, _sideX] call A3A_fnc_AIVEHinit;
 		if (not(_mrkDestination in airportsX)) then {_uav removeMagazines "6Rnd_LG_scalpel"};
-		[3, format ["Spawning vehicle type %1", _typeVehX], _filename] call A3A_fnc_log;
+        Debug_1("Spawning vehicle type %1", _typeVehX);
 		sleep 5;
 		_countX = _countX + 1;
 	};
@@ -528,17 +527,17 @@ while {(_waves > 0)} do
 		else {
 			if (count _vehPoolAirTransport == 0) then {
 				for "_i" from 1 to 10 do { vehPoolAirTransport pushBack _typePatrolHeli };
-				[2, "Attack ran out of air transports", _filename] call A3A_fnc_log;
+                Info("Attack ran out of air transports");
 				_waves = 0;
 			};
 			_typeVehX = selectRandom _vehPoolAirTransport;
 			_vehPoolAirTransport deleteAt (_vehPoolAirTransport find _typeVehX);
 		};
-		[3, format ["Spawning vehicle type %1", _typeVehX], _filename] call A3A_fnc_log;
+        Debug_1("Spawning vehicle type %1", _typeVehX);
 
 		if (true) then
 			{
-			_vehicle=[_pos, _ang + 90,_typeVehX, _sideX] call bis_fnc_spawnvehicle;
+			_vehicle=[_pos, _ang + 90,_typeVehX, _sideX] call A3A_fnc_spawnVehicle;
 			_veh = _vehicle select 0;
 			if (_veh isKindOf "Plane") then {
 				_veh setVelocityModelSpace (velocityModelSpace _veh vectorAdd [0, 150, 50]);
@@ -582,11 +581,11 @@ while {(_waves > 0)} do
 				} forEach units _grupo;
 				if (!(_veh isKindOf "Helicopter") or (_mrkDestination in airportsX)) then
 					{
-					[_veh,_grupo,_mrkDestination,_mrkOrigin] spawn A3A_fnc_airdrop;
+					[_veh,_grupo,_mrkDestination,_mrkOrigin] spawn A3A_fnc_paradrop;
 					}
 				else
 					{
-					_landPos = _posDestination getPos [300, random 360];
+					_landPos = _posDestination getPos [150, random 360];
 					_landPos = [_landPos, 0, 550, 10, 0, 0.20, 0,[],[[0,0,0],[0,0,0]]] call BIS_fnc_findSafePos;
 					if !(_landPos isEqualTo [0,0,0]) then
 						{
@@ -619,78 +618,58 @@ while {(_waves > 0)} do
 							}
 						else
 							{
-							[_veh,_grupo,_mrkDestination,_mrkOrigin] spawn A3A_fnc_airdrop;
+							[_veh,_grupo,_mrkDestination,_mrkOrigin] spawn A3A_fnc_paradrop;
 							}
 						};
 					};
 				};
 			};
 		if ((_countX > _countNewSupport) && (count _soldiers >= 10) && (call _fnc_remUnitCount < 5)) exitWith {
-			[2, format ["Air wave reached maximum units count after %1 vehicles", _countX], _filename] call A3A_fnc_log;
+            Info_1("Air wave reached maximum units count after %1 vehicles", _countX);
 		};
 		sleep 1;
 		_pos = [_pos, 80,_ang] call BIS_fnc_relPos;
 		_countX = _countX + 1;
 		};
 
-	[2, format ["Spawn performed: %1 air vehicles inc. %2 supports, %3 land vehicles, %4 soldiers", _nVehAir, _countNewSupport, _nVehLand, count _soldiers], _filename] call A3A_fnc_log;
+    Info_4("Spawn performed: %1 air vehicles inc. %2 supports, %3 land vehicles, %4 soldiers", _nVehAir, _countNewSupport, _nVehLand, count _soldiers);
 
 	_plane = if (_sideX == Occupants) then {vehNATOPlane} else {vehCSATPlane};
 	if (_sideX == Occupants) then
 		{
-		if (((not(_mrkDestination in outposts)) and (not(_mrkDestination in seaports)) and (_mrkOrigin != "NATO_carrier")) or hasIFA) then
+		if (((not(_mrkDestination in outposts)) and (not(_mrkDestination in seaports)) and (_mrkOrigin != "NATO_carrier")) or A3A_hasIFA) then
 			{
-			[_mrkOrigin,_mrkDestination,_sideX] spawn A3A_fnc_artillery;
-			diag_log "Antistasi: Arty Spawned";
+            private _reveal = [getMarkerPos _mrkDestination, _sideX] call A3A_fnc_calculateSupportCallReveal;
+            [getMarkerPos _mrkDestination, 4, ["MORTAR"], _sideX, _reveal] remoteExec ["A3A_fnc_sendSupport", 2];
 			if (([_plane] call A3A_fnc_vehAvailable) and (not(_mrkDestination in citiesX)) and _firstWave) then
 				{
 				sleep 60;
 				_rnd = if (_mrkDestination in airportsX) then {round random 4} else {round random 2};
-				private _bombOptions = if (napalmEnabled) then {["HE","CLUSTER","NAPALM"]} else {["HE","CLUSTER"]};
 				for "_i" from 0 to _rnd do
 					{
-					if ([_plane] call A3A_fnc_vehAvailable) then
-						{
-						diag_log "Antistasi: Airstrike Spawned";
-						if (_i == 0 && {_mrkDestination in airportsX}) then
-							{
-							_nul = [_mrkDestination,_sideX,"HE"] spawn A3A_fnc_airstrike;
-							}
-						else
-							{
-							_nul = [_mrkDestination,_sideX,selectRandom _bombOptions] spawn A3A_fnc_airstrike;
-							};
-						sleep 30;
-						};
+                        private _reveal = [getMarkerPos _mrkDestination, _sideX] call A3A_fnc_calculateSupportCallReveal;
+                        [getMarkerPos _mrkDestination, 4, ["AIRSTRIKE"], _sideX, _reveal] remoteExec ["A3A_fnc_sendSupport", 2];
+                        sleep 30;
 					};
 				};
 			};
 		}
 	else
 		{
-		if (((not(_mrkDestination in resourcesX)) and (not(_mrkDestination in seaports)) and (_mrkOrigin != "CSAT_carrier")) or hasIFA) then
+		if (((not(_mrkDestination in resourcesX)) and (not(_mrkDestination in seaports)) and (_mrkOrigin != "CSAT_carrier")) or A3A_hasIFA) then
 			{
-			if !(_posOriginLand isEqualTo []) then {[_posOriginLand,_mrkDestination,_sideX] spawn A3A_fnc_artillery} else {[_mrkOrigin,_mrkDestination,_sideX] spawn A3A_fnc_artillery};
-			diag_log "Antistasi: Arty Spawned";
+                private _reveal = [getMarkerPos _mrkDestination, _sideX] call A3A_fnc_calculateSupportCallReveal;
+                    [getMarkerPos _mrkDestination, 4, ["MORTAR"], _sideX, _reveal] remoteExec ["A3A_fnc_sendSupport", 2];
 			if (([_plane] call A3A_fnc_vehAvailable) and (_firstWave)) then
 				{
 				sleep 60;
 				_rnd = if (_mrkDestination in airportsX) then {if ({sidesX getVariable [_x,sideUnknown] == Invaders} count airportsX == 1) then {8} else {round random 4}} else {round random 2};
-				private _bombOptions = if (napalmEnabled) then {["HE","CLUSTER","NAPALM"]} else {["HE","CLUSTER"]};
 				for "_i" from 0 to _rnd do
 					{
 					if ([_plane] call A3A_fnc_vehAvailable) then
 						{
-						diag_log "Antistasi: Airstrike Spawned";
-						if (_i == 0 && {_mrkDestination in airportsX}) then
-							{
-							_nul = [_mrkDestination,_sideX,"HE"] spawn A3A_fnc_airstrike;
-							}
-						else
-							{
-							_nul = [_posDestination,_sideX,selectRandom _bombOptions] spawn A3A_fnc_airstrike;
-							};
-						sleep 30;
+                            private _reveal = [getMarkerPos _mrkDestination, _sideX] call A3A_fnc_calculateSupportCallReveal;
+                            [getMarkerPos _mrkDestination, 4, ["AIRSTRIKE"], _sideX, _reveal] remoteExec ["A3A_fnc_sendSupport", 2];
 						};
 					};
 				};

@@ -2,6 +2,8 @@
 //el sitio de la boxX es el 21
 if (!isServer and hasInterface) exitWith {};
 private ["_banco","_markerX","_difficultX","_leave","_contactX","_groupContact","_tsk","_posHQ","_citiesX","_city","_radiusX","_positionX","_posHouse","_nameDest","_timeLimit","_dateLimit","_dateLimitNum","_posBase","_pos","_truckX","_countX","_mrkFinal","_mrk","_soldiers"];
+#include "..\..\Includes\common.inc"
+FIX_LINE_NUMBERS()
 _banco = _this select 0;
 _markerX = [citiesX,_banco] call BIS_fnc_nearestPosition;
 
@@ -15,7 +17,7 @@ _positionX = getPosASL _banco;
 _posbase = getMarkerPos respawnTeamPlayer;
 
 _timeLimit = if (_difficultX) then {60} else {120};
-if (hasIFA) then {_timeLimit = _timeLimit * 2};
+if (A3A_hasIFA) then {_timeLimit = _timeLimit * 2};
 _dateLimit = [date select 0, date select 1, date select 2, date select 3, (date select 4) + _timeLimit];
 _dateLimitNum = dateToNumber _dateLimit;
 _dateLimit = numberToDate [date select 0, _dateLimitNum];//converts datenumber back to date array so that time formats correctly
@@ -80,7 +82,8 @@ if ((dateToNumber date > _dateLimitNum) or (!alive _truckX)) then
 else
 	{
 	_countX = 120*_bonus;//120
-	[[_positionX,Occupants,"",true],"A3A_fnc_patrolCA"] remoteExec ["A3A_fnc_scheduler",2];
+    private _reveal = [_positionX , Invaders] call A3A_fnc_calculateSupportCallReveal;
+    [_positionX, 4, ["QRF"], Invaders, _reveal] remoteExec ["A3A_fnc_sendSupport", 2];
 	[10*_bonus,-20*_bonus,_markerX] remoteExec ["A3A_fnc_citySupportChange",2];
 	["TaskFailed", ["", format ["Bank of %1 being assaulted",_nameDest]]] remoteExec ["BIS_fnc_showNotification",Occupants];
 	{_friendX = _x;
@@ -126,12 +129,7 @@ if ((_truckX distance _posbase < 50) and (dateToNumber date < _dateLimitNum)) th
 	{
 	["LOG",[format ["We know Gendarmes is guarding a large amount of money in the bank of %1. Take this truck and go there before %2, hold the truck close to tha bank's main entrance for 2 minutes and the money will be transferred to the truck. Bring it back to HQ and the money will be ours.",_nameDest,_displayTime],"Bank Robbery",_mrkFinal],_positionX,"SUCCEEDED","Interact"] call A3A_fnc_taskUpdate;
 	[0,5000*_bonus] remoteExec ["A3A_fnc_resourcesFIA",2];
-    [
-        3,
-        "Rebels won a bank mission",
-        "aggroEvent",
-        true
-    ] call A3A_fnc_log;
+    Debug("aggroEvent | Rebels won a bank mission");
 	[[20 * _bonus, 120], [0, 0]] remoteExec ["A3A_fnc_prestige",2];
 	[1800*_bonus, Occupants] remoteExec ["A3A_fnc_timingCA",2];
 	{if (_x distance _truckX < 500) then {[10*_bonus,_x] call A3A_fnc_playerScoreAdd}} forEach (allPlayers - (entities "HeadlessClient_F"));

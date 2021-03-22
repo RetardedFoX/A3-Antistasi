@@ -1,11 +1,12 @@
 #include "..\Garage\defineGarage.inc"
-private _fileName = "initClient.sqf";
+#include "..\..\Includes\common.inc"
+FIX_LINE_NUMBERS()
 
 //Make sure logLevel is always initialised.
 //This should be overridden by the server, as appropriate. Hence the nil check.
 if (isNil "logLevel") then { logLevel = 2 };scriptName "initClient.sqf";
 
-[2,"initClient started",_fileName] call A3A_fnc_log;
+Info("initClient started");
 
 call A3A_fnc_installSchrodingersBuildingFix;
 
@@ -26,7 +27,7 @@ if (!hasInterface) exitWith {
 	call A3A_fnc_initFuncs;
 	call A3A_fnc_initVar;
 	call A3A_fnc_loadNavGrid;
-	[2,format ["Headless client version: %1",localize "STR_antistasi_credits_generic_version_text"],_fileName] call A3A_fnc_log;
+    Info_1("Headless client version: %1",localize "STR_antistasi_credits_generic_version_text");
 	[clientOwner] remoteExec ["A3A_fnc_addHC",2];
 };
 
@@ -37,9 +38,10 @@ waitUntil {player == player};
 player setVariable ["canSave", false, true];
 
 if (!isServer) then {
+	waitUntil {!isNil "initParamsDone"};
 	call A3A_fnc_initFuncs;
 	call A3A_fnc_initVar;
-	[2,format ["MP client version: %1",localize "STR_antistasi_credits_generic_version_text"],_fileName] call A3A_fnc_log;
+    Info_1("MP client version: %1",localize "STR_antistasi_credits_generic_version_text");
 }
 else {
 	// SP or hosted, initFuncs/var run in serverInit
@@ -53,18 +55,16 @@ if (isMultiplayer) then {
 		player setVariable ["eligible",true,true];
 	};
 	musicON = false;
-	//waitUntil {scriptdone _introshot};
 	disableUserInput true;
 	cutText ["Waiting for Players and Server Init","BLACK",0];
-	[2,"Waiting for server...",_fileName] call A3A_fnc_log;
+    Info("Waiting for server...");
 	waitUntil {(!isNil "serverInitDone")};
 	cutText ["Starting Mission","BLACK IN",0];
-	[2,"Server loaded!",_fileName] call A3A_fnc_log;
-	[2,format ["JIP client: %1",_isJIP],_fileName] call A3A_fnc_log;
+	Info("Server loaded!");
+    Info_1("JIP client: %1",_isJIP);
 	if (hasTFAR) then {
 		[] execVM "orgPlayers\radioJam.sqf";
 	};
-	tkPunish = if ("tkPunish" call BIS_fnc_getParamValue == 1) then {true} else {false};
 	if (!isNil "placementDone") then {_isJip = true};//workaround for BIS fail on JIP detection
 }
 else {
@@ -77,34 +77,10 @@ else {
 	player hcSetGroup [group player];		// why?
 	player setUnitTrait ["medic", true];
 	player setUnitTrait ["engineer", true];
-	waitUntil {/*(scriptdone _introshot) and */(!isNil "serverInitDone")};
+	waitUntil {!isNil "serverInitDone"};
 };
 
 [] spawn A3A_fnc_ambientCivs;
-private ["_colourTeamPlayer", "_colorInvaders"];
-_colourTeamPlayer = teamPlayer call BIS_fnc_sideColor;
-_colorInvaders = Invaders call BIS_fnc_sideColor;
-_positionX = if (side player isEqualTo teamPlayer) then {position petros} else {getMarkerPos "respawn_west"};
-
-{
-	_x set [3, 0.33]
-} forEach [_colourTeamPlayer, _colorInvaders];
-
-_introShot = [
-	_positionX, // Target position
-	format ["%1",worldName], // SITREP text
-	50, //  altitude
-	50, //  radius
-	90, //  degrees viewing angle
-	0, // clockwise movement
-	[
-		["\a3\ui_f\data\map\markers\Nato\o_inf.paa", _colourTeamPlayer, markerPos "insertMrk", 1, 1, 0, "Insertion Point", 0],
-		["\a3\ui_f\data\map\markers\Nato\o_inf.paa", _colorInvaders, markerPos "towerBaseMrk", 1, 1, 0, "Radio Towers", 0]
-	]
-] spawn BIS_fnc_establishingShot;
-
-//Initialise membershipEnabled so we can do isMember checks.
-membershipEnabled = if (isMultiplayer && "membership" call BIS_fnc_getParamValue == 1) then {true} else {false};
 
 disableUserInput false;
 player setVariable ["spawner",true,true];
@@ -288,9 +264,11 @@ player addEventHandler ["WeaponAssembled", {
 		};
 		_markersX = markersX select {sidesX getVariable [_x,sideUnknown] == teamPlayer};
 		_pos = position _veh;
+		[_veh] call A3A_fnc_logistics_addLoadAction;
 		if (_markersX findIf {_pos inArea _x} != -1) then {["Static Deployed", "Static weapon has been deployed for use in a nearby zone, and will be used by garrison militia if you leave it here the next time the zone spawns"] call A3A_fnc_customHint;};
 	};
 }];
+
 player addEventHandler ["WeaponDisassembled", {
 	private _bag1 = _this select 1;
 	private _bag2 = _this select 2;
@@ -365,10 +343,8 @@ if !(isPlayer leader group player) then {
 
 [] remoteExec ["A3A_fnc_assignBossIfNone", 2];
 
-waitUntil { scriptDone _introshot };
-
 if (_isJip) then {
-	[2,"Joining In Progress (JIP)",_filename] call A3A_fnc_log;
+    Info("Joining In Progress (JIP)");
 
 	waitUntil {!(isNil "missionsX")};
 	if (count missionsX > 0) then {
@@ -389,7 +365,7 @@ if (_isJip) then {
 }
 else
 {
-	[2,"Not Joining in Progress (JIP)",_filename] call A3A_fnc_log;
+    Info("Not Joining in Progress (JIP)");
 };
 
 [] spawn A3A_fnc_modBlacklist;
@@ -397,35 +373,29 @@ else
 //Move this
 //HC_commanderX synchronizeObjectsAdd [player];
 //player synchronizeObjectsAdd [HC_commanderX];
+A3A_customHintEnable = true; // Was false in initVarCommon to allow debug progress  hints to flow in and overwrite each other.
 
-_textX = [];
+if (isServer || player isEqualTo theBoss || (call BIS_fnc_admin) > 0) then {  // Local Host || Commander || Dedicated Admin
+	private _modsAndLoadText = [
+		[hasTFAR,"TFAR","Players will use TFAR radios. Unconscious players' radios will be muted."],
+		[hasACRE,"ACRE","Players will use ACRE radios. Unconscious players' radios will be muted."],
+		[hasACE,"ACE 3","ACE items added to arsenal and ammo-boxes."],
+		[hasACEMedical,"ACE 3 Medical","Default revive system will be disabled"],
+		[A3A_hasRHS,"RHS","All factions will be replaced by RHS (AFRF &amp; USAF &amp; GREF)."],
+		[A3A_has3CBFactions,"3CB Factions","All Factions will be Replaced by 3CB Factions."],
+		[A3A_has3CBBAF,"3CB BAF","Occupant Faction will be Replaced by British Armed forces."],
+		[A3A_hasFFAA,"FFAA","Occupant faction will be replaced by Spanish Armed Forces"],
+		[A3A_hasIvory,"Ivory Cars","Mod cars will be added to civilian car spawns."]
+	] select {_x#0};
 
-if ((hasTFAR) or (hasACRE)) then {
-	_textX = ["TFAR or ACRE Detected\n\nAntistasi detects TFAR or ACRE in the server config.\nAll players will start with addon default radios.\nDefault revive system will shut down radios while players are unconscious.\n\n"];
-};
-if (hasACE) then {
-	_textX = _textX + ["ACE 3 Detected\n\nAntistasi detects ACE modules in the server config.\nACE items added to arsenal and ammoboxes. Default AI control is disabled\nIf ACE Medical is used, default revive system will be disabled.\nIf ACE Hearing is used, default earplugs will be disabled."];
-};
-if (hasRHS) then {
-	_textX = _textX + ["RHS Detected\n\nAntistasi detects RHS in the server config.\nDepending on the modules will have the following effects.\n\nAFRF: Replaces CSAT by a mix of russian units\n\nUSAF: Replaces NATO by a mix of US units\n\nGREF: Recruited AI will count with RHS as basic weapons, replaces FIA with Chdk units. Adds some civilian trucks"];
-};
-if (hasFFAA) then {
-	_textX = _textX + ["FFAA Detected\n\nAntistasi detects FFAA in the server config.\nFIA Faction will be replaced by Spanish Armed Forces"];
+	private _loadedTemplateInfoXML = A3A_loadedTemplateInfoXML apply {[true,_x#0,_x#1]};	// Remove and simplify when the list above is empty and can be deleted.
+	_modsAndLoadText append _loadedTemplateInfoXML;
+
+	if (count _modsAndLoadText isEqualTo 0) exitWith {};
+	private _textXML = "<t align='left'>" + ((_modsAndLoadText apply { "<t color='#f0d498'>" + _x#1 + ":</t>" + _x#2 }) joinString "<br/>") + "</t>";
+	["Loaded Mods",_textXML] call A3A_fnc_customHint;
 };
 
-if (hasTFAR or hasACE or hasRHS or hasACRE or hasFFAA) then {
-	[_textX] spawn {
-		sleep 0.5;
-		_textX = _this select 0;
-		"Integrated Mods Detected" hintC _textX;
-		hintC_arr_EH = findDisplay 72 displayAddEventHandler ["unload", {
-			0 = _this spawn {
-				_this select 0 displayRemoveEventHandler ["unload", hintC_arr_EH];
-				hintSilent "";
-			};
-		}];
-	};
-};
 waituntil {!isnull (finddisplay 46)};
 gameMenu = (findDisplay 46) displayAddEventHandler ["KeyDown",A3A_fnc_keys];
 //removeAllActions boxX;
@@ -436,7 +406,7 @@ gameMenu = (findDisplay 46) displayAddEventHandler ["KeyDown",A3A_fnc_keys];
 if (hasACE) then
 {
 	if (isNil "ace_interact_menu_fnc_compileMenu" || isNil "ace_interact_menu_fnc_compileMenuSelfAction") exitWith {
-		[1, "ACE non-public functions have changed, rebel group join/leave actions will not be removed", _filename] call A3A_fnc_log;
+        Error("ACE non-public functions have changed, rebel group join/leave actions will not be removed");
 	};
 	// Remove group join action from all rebel unit types
 	// Need to compile the menus first, because ACE delays creating menus until a unit of that class is created
@@ -486,11 +456,24 @@ fireX allowDamage false;
 [fireX, "fireX"] call A3A_fnc_flagaction;
 
 mapX allowDamage false;
-mapX addAction ["Game Options", {["Game Options", format ["Antistasi - %2<br/><br/>Version: %1<br/><br/>Difficulty: %3<br/>Unlock Weapon Number: %4<br/>Limited Fast Travel: %5",antistasiVersion,worldName,if (skillMult == 2) then {"Normal"} else {if (skillMult == 1) then {"Easy"} else {"Hard"}},minWeaps,if (limitedFT) then {"Yes"} else {"No"}]] call A3A_fnc_customHint; nul=CreateDialog "game_options";},nil,0,false,true,"","(isPlayer _this) and (_this == _this getVariable ['owner',objNull]) and (side (group _this) == teamPlayer)", 4];
+mapX addAction ["Game Options", {
+	[
+		"Game Options",
+		"Version: "+ antistasiVersion +
+		"<br/><br/>Difficulty: "+ ( ["Easy","Normal","Hard"] select ((skillMult-1) min 2) ) +
+		"<br/>Unlock Weapon Number: "+ str minWeaps +
+		"<br/>Limited Fast Travel: "+ (["No","Yes"] select limitedFT) +
+		"<br/>AI Limit: "+ str maxUnits +
+		"<br/>Spawn Distance: "+ str distanceSPWN + "m" +
+		"<br/>Civilian Limit: "+ str civPerc
+	] call A3A_fnc_customHint;
+	CreateDialog "game_options";
+	nil;
+},nil,0,false,true,"","(isPlayer _this) and (_this == _this getVariable ['owner',objNull]) and (side (group _this) == teamPlayer)", 4];
 mapX addAction ["Map Info", A3A_fnc_cityinfo,nil,0,false,true,"","(isPlayer _this) and (_this == _this getVariable ['owner',objNull]) and (side (group _this) == teamPlayer)", 4];
 mapX addAction ["Move this asset", A3A_fnc_moveHQObject,nil,0,false,true,"","(_this == theBoss)", 4];
 if (isMultiplayer) then {mapX addAction ["AI Load Info", { [] remoteExec ["A3A_fnc_AILoadInfo",2];},nil,0,false,true,"","((_this == theBoss) || (serverCommandAvailable ""#logout""))"]};
-_nul = [player] execVM "OrgPlayers\unitTraits.sqf";
+[] execVM "OrgPlayers\unitTraits.sqf";
 
 // only add petros actions if he's static
 if (petros == leader group petros) then {
@@ -522,11 +505,9 @@ if (isMultiplayer) then {
 }
 else
 {
-	if (loadLastSave) then {
-		// just do this directly, because playerHasSave doesn't work without moneyX
-		private _loadout = [getPlayerUID player, "loadoutPlayer"] call A3A_fnc_retrievePlayerStat;
-		if (!isNil "_loadout") then { player setUnitLoadout _loadout };
-	};
+	// just do this directly, because playerHasSave doesn't work without moneyX
+	private _loadout = [getPlayerUID player, "loadoutPlayer"] call A3A_fnc_retrievePlayerStat;
+	if (!isNil "_loadout") then { player setUnitLoadout _loadout };
 	player setVariable ["canSave", true];
 };
 
@@ -538,8 +519,7 @@ player setPos (getMarkerPos respawnTeamPlayer);
 //Can re-enable them if we find the source of the bug.
 enableEnvironment [false, true];
 
-[2,"initClient completed",_fileName] call A3A_fnc_log;
-A3A_customHintEnable = true; // Was false in initVarCommon to allow hints to flow in and overwrite each other.
+Info("initClient completed");
 
 if(!isMultiplayer) then
 {
