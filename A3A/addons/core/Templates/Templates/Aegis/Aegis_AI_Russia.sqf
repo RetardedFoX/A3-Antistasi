@@ -81,6 +81,7 @@ if ("rf" in A3A_enabledDLC) then {
     _vehiclesMilitiaCars append ["O_T_Pickup_rf"];
     _vehiclesMilitiaLightArmed append ["a3a_ghex_Pickup_mmg_rf"];
 };
+
 ["vehiclesPolice", _vehiclesPolice] call _fnc_saveToTemplate;
 
 ["vehiclesMilitiaCars", _vehiclesMilitiaCars] call _fnc_saveToTemplate;
