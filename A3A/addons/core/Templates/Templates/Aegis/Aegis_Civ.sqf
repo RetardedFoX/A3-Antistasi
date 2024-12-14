@@ -115,7 +115,24 @@ private _civUniforms = [
     "U_C_Commoner1_3",
     "U_C_Uniform_Formal_01_blue_F",
     "U_C_Uniform_Formal_01_striped_F",
-    "U_C_Uniform_Formal_01_white_F"
+    "U_C_Uniform_Formal_01_white_F",
+    "U_lxWS_C_Djella_01",   // This and below is WS
+    "U_lxWS_C_Djella_02",
+    "U_lxWS_C_Djella_02a",
+    "U_lxWS_C_Djella_03",
+    "U_lxWS_C_Djella_04",
+    "U_lxWS_C_Djella_05",
+    "U_lxWS_C_Djella_06",
+    "U_lxWS_C_Djella_07",
+    "U_lxWS_Tak_01_A",
+    "U_lxWS_Tak_01_B",
+    "U_lxWS_Tak_01_C",
+    "U_lxWS_Tak_02_A",
+    "U_lxWS_Tak_02_B",
+    "U_lxWS_Tak_02_C",
+    "U_lxWS_Tak_03_A",
+    "U_lxWS_Tak_03_B",
+    "U_lxWS_Tak_03_C"
 ];
 
 private _pressUniforms = [
@@ -151,28 +168,6 @@ if ("orange" in A3A_enabledDLC) then {
     "U_C_ConstructionCoverall_Blue_F",
     "U_C_ConstructionCoverall_Red_F",
     "U_C_ConstructionCoverall_Vrana_F"
-  ];
-};
-
-if ("ws" in A3A_enabledDLC) then {
-  _dlcUniforms append [
-    "U_lxWS_C_Djella_01",
-    "U_lxWS_C_Djella_02",
-    "U_lxWS_C_Djella_02a",
-    "U_lxWS_C_Djella_03",
-    "U_lxWS_C_Djella_04",
-    "U_lxWS_C_Djella_05",
-    "U_lxWS_C_Djella_06",
-    "U_lxWS_C_Djella_07",
-    "U_lxWS_Tak_01_A",
-    "U_lxWS_Tak_01_B",
-    "U_lxWS_Tak_01_C",
-    "U_lxWS_Tak_02_A",
-    "U_lxWS_Tak_02_B",
-    "U_lxWS_Tak_02_C",
-    "U_lxWS_Tak_03_A",
-    "U_lxWS_Tak_03_B",
-    "U_lxWS_Tak_03_C"
   ];
 };
 

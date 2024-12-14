@@ -9,11 +9,11 @@
 ["flagMarkerType", "flag_Syndicat"] call _fnc_saveToTemplate;
 
 ["vehiclesBasic", "I_G_Quadbike_01_F"] call _fnc_saveToTemplate;
-private _vehiclesLightUnarmed = ["I_C_Offroad_02_unarmed_F", "I_G_Offroad_01_F"];
-private _vehiclesLightArmed = ["I_G_Offroad_01_armed_F", "I_C_Offroad_02_LMG_F"];
+private _vehiclesLightUnarmed = ["I_C_Offroad_02_unarmed_F", "I_G_Offroad_01_F", "I_G_Offroad_01_armor_base_lxWS"];
+private _vehiclesLightArmed = ["I_G_Offroad_01_armed_F", "I_C_Offroad_02_LMG_F", "I_G_Offroad_01_armor_armed_lxWS"];
 ["vehiclesTruck", ["I_C_Van_01_transport_F"]] call _fnc_saveToTemplate;
-private _vehiclesAT = ["I_C_Offroad_02_AT_F", "I_G_Offroad_01_AT_F"];
-private _vehicleAA = [];
+["vehiclesAT", ["I_C_Offroad_02_AT_F", "I_G_Offroad_01_AT_F", "I_G_Offroad_01_armor_AT_lxWS"]] call _fnc_saveToTemplate;
+["vehiclesAA", ["I_Tura_Truck_02_aa_lxWS"]] call _fnc_saveToTemplate;
 
 ["vehiclesBoat", ["I_C_Boat_Transport_02_F", "C_Boat_Civil_02_F"]] call _fnc_saveToTemplate;
 
@@ -26,7 +26,7 @@ private _vehiclesCivHeli = ["C_Heli_Light_01_civil_F", "a3a_C_Heli_Transport_02_
 
 ["staticMGs", ["I_G_HMG_02_high_F", "I_G_HMG_02_F"]] call _fnc_saveToTemplate;
 ["staticAT", ["I_static_AT_F"]] call _fnc_saveToTemplate;
-private _staticAA = ["I_static_AA_F"];
+["staticAA", ["I_Tura_ZU23_lxWS"]] call _fnc_saveToTemplate;
 private _staticMortars = ["I_G_Mortar_01_F"];
 ["staticMortarMagHE", "8Rnd_82mm_Mo_shells"] call _fnc_saveToTemplate;
 ["staticMortarMagSmoke", "8Rnd_82mm_Mo_Smoke_white"] call _fnc_saveToTemplate;
@@ -38,13 +38,6 @@ private _staticMortars = ["I_G_Mortar_01_F"];
 ["breachingExplosivesAPC", [["DemoCharge_Remote_Mag", 1]]] call _fnc_saveToTemplate;
 ["breachingExplosivesTank", [["SatchelCharge_Remote_Mag", 1], ["DemoCharge_Remote_Mag", 2]]] call _fnc_saveToTemplate;
 
-if ("ws" in A3A_enabledDLC) then {
-    _vehicleAA append ["I_Tura_Truck_02_aa_lxWS"];
-    _staticAA insert [0, ["I_Tura_ZU23_lxWS"]];
-    _vehiclesLightUnarmed insert [1, ["I_G_Offroad_01_armor_base_lxWS"]];
-    _vehiclesLightArmed insert [1, ["I_G_Offroad_01_armor_armed_lxWS"]];
-    _vehiclesAT insert [1, ["I_G_Offroad_01_armor_AT_lxWS"]];
-};
 if ("rf" in A3A_enabledDLC) then {
     _vehiclesCivCar append ["C_Pickup_rf","C_Pickup_covered_rf"];
     _vehiclesLightUnarmed append ["a3a_FIA_Pickup_rf", "a3a_FIA_Pickup_covered_rf"];
@@ -57,10 +50,7 @@ if ("rf" in A3A_enabledDLC) then {
 ["vehiclesCivHeli", _vehiclesCivHeli] call _fnc_saveToTemplate;
 ["vehiclesLightUnarmed", _vehiclesLightUnarmed] call _fnc_saveToTemplate;
 ["vehiclesLightArmed", _vehiclesLightArmed] call _fnc_saveToTemplate;
-["vehiclesAT", _vehiclesAT] call _fnc_saveToTemplate;
-["vehiclesAA", _vehicleAA] call _fnc_saveToTemplate;
 
-["staticAA", _staticAA] call _fnc_saveToTemplate;
 ["staticMortars", _staticMortars] call _fnc_saveToTemplate;
 
 #include "..\Vanilla\Vanilla_Vehicle_Attributes.sqf"
@@ -78,7 +68,7 @@ private _initialRebelEquipment = [
     "V_Chestrig_blk","V_Chestrig_rgr","V_Chestrig_khk","V_Chestrig_oli","V_ChestrigF_blk","V_ChestrigF_rgr","V_ChestrigF_khk","V_ChestrigF_oli",
     "Aegis_V_Ammo_Bandolier_F","V_BandollierB_blk","V_BandollierB_cbr","V_BandollierB_rgr","V_BandollierB_khk","V_BandollierB_oli","V_BandollierB_taiga_F","V_BandollierB_tna_F",
     "V_Rangemaster_belt","V_Rangemaster_belt_blk","V_Rangemaster_belt_cbr","V_Rangemaster_belt_ghex_F","V_Rangemaster_belt_khk","V_Rangemaster_belt_oli","V_Rangemaster_belt_taiga_F","V_Rangemaster_belt_tna_F",
-    "Binocular","hgun_Pistol_Signal_F","6Rnd_GreenSignal_F","6Rnd_RedSignal_F",
+    "Binocular", "Camera_lxWS","hgun_Pistol_Signal_F","6Rnd_GreenSignal_F","6Rnd_RedSignal_F",
     "acc_flashlight","acc_flashlight_smg_01","acc_flashlight_pistol"
 ];
 _initialRebelEquipment append [["launch_RPG7_F", 15], ["RPG7_F", 45]];
@@ -125,7 +115,13 @@ private _rebUniforms = [
     "U_I_L_Uniform_01_deserter_F",
     "U_B_ION_Uniform_01_poloshirt_blue_F",  //Aegis
     "U_B_ION_Uniform_01_poloshirt_wdl_F",   //Aegis
-    "U_B_ION_Uniform_01_tshirt_black_F"     //Aegis
+    "U_B_ION_Uniform_01_tshirt_black_F",    //Aegis
+    "U_lxWS_ION_Casual1",   // WS
+    "U_lxWS_ION_Casual2",   // WS
+    "U_lxWS_ION_Casual3",   // WS
+    "U_lxWS_ION_Casual4",   // WS
+    "U_lxWS_ION_Casual5",   // WS
+    "U_lxWS_SFIA_deserter"  // WS
 ];
 
 private _dlcUniforms = [];
@@ -139,17 +135,6 @@ if ("enoch" in A3A_enabledDLC) then {
 if ("orange" in A3A_enabledDLC) then {
     _dlcUniforms append [
         "U_IG_Guerilla1_2_F"
-    ];
-};
-
-if ("ws" in A3A_enabledDLC) then {
-    _dlcUniforms append [
-        "U_lxWS_ION_Casual1",
-        "U_lxWS_ION_Casual2",
-        "U_lxWS_ION_Casual3",
-        "U_lxWS_ION_Casual4",
-        "U_lxWS_ION_Casual5",
-        "U_lxWS_SFIA_deserter"
     ];
 };
 

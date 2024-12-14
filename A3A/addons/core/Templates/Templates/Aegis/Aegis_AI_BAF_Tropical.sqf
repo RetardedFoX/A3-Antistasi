@@ -52,7 +52,7 @@ private _vehiclesHelisLightAttack = ["B_A_Heli_light_03_dynamicLoadout_F"];
 ]] call _fnc_saveToTemplate;
 
 ["uavsAttack", ["B_UAV_02_dynamicLoadout_F"]] call _fnc_saveToTemplate;
-["uavsPortable", ["B_UAV_01_F"]] call _fnc_saveToTemplate;
+["uavsPortable", ["B_UAV_01_F", "B_UAV_02_lxWS"]] call _fnc_saveToTemplate;
 
 //Config special vehicles - militia vehicles are mostly used in the early game, police cars are being used by troops around cities.
 private _vehiclesMilitiaLightArmed = ["B_A_LSV_01_armed_tna_F"];

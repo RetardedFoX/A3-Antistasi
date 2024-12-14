@@ -21,14 +21,14 @@
 ["vehiclesLightUnarmed", ["O_T_LSV_02_unarmed_F","O_T_MRAP_02_ghex_F"]] call _fnc_saveToTemplate;
 ["vehiclesLightArmed",["O_T_MRAP_02_gmg_ghex_F","O_T_MRAP_02_hmg_ghex_F","O_T_LSV_02_armed_F","O_T_LSV_02_AT_F"]] call _fnc_saveToTemplate;
 ["vehiclesTrucks", ["O_T_Truck_02_transport_F","O_T_Truck_02_F","O_T_Truck_03_transport_ghex_F","O_T_Truck_03_covered_ghex_F"]] call _fnc_saveToTemplate;
-private _cargoTrucks = ["O_T_Truck_02_transport_F","O_T_Truck_02_F","O_T_Truck_03_transport_ghex_F","O_T_Truck_03_covered_ghex_F"];
+["vehiclesCargoTrucks", ["O_T_Truck_02_transport_F","O_T_Truck_02_F","O_T_Truck_03_transport_ghex_F","O_T_Truck_03_covered_ghex_F","O_T_Truck_02_cargo_lxWS","O_T_Truck_02_flatbed_lxWS"]] call _fnc_saveToTemplate;
 ["vehiclesAmmoTrucks", ["O_T_Truck_03_ammo_ghex_F","O_T_Truck_02_Ammo_F"]] call _fnc_saveToTemplate;
 ["vehiclesRepairTrucks", ["O_T_Truck_02_Box_F","O_T_Truck_03_repair_ghex_F"]] call _fnc_saveToTemplate;
 ["vehiclesFuelTrucks", ["O_T_Truck_02_fuel_F","O_T_Truck_03_fuel_ghex_F"]] call _fnc_saveToTemplate;
 ["vehiclesMedical", ["O_T_Truck_03_medical_ghex_F","O_T_Truck_02_Medical_F"]] call _fnc_saveToTemplate;
-["vehiclesLightAPCs", []] call _fnc_saveToTemplate;
+["vehiclesLightAPCs", ["O_T_APC_Wheeled_02_hmg_lxWS", "O_T_APC_Wheeled_02_unarmed_lxWS"]] call _fnc_saveToTemplate;
 ["vehiclesAPCs", ["O_T_APC_Wheeled_02_rcws_v2_ghex_F", "a3a_O_T_APC_Wheeled_02_rcws_v2_ghex_F"]] call _fnc_saveToTemplate;
-private _vehiclesIFVs = ["a3a_O_T_APC_Tracked_02_cannon_ghex_F", "O_T_APC_Tracked_02_cannon_ghex_F"];
+["vehiclesIFVs", ["a3a_O_T_APC_Tracked_02_cannon_ghex_F", "O_T_APC_Tracked_02_cannon_ghex_F", "O_T_APC_Tracked_02_30mm_lxWS"]] call _fnc_saveToTemplate;
 ["vehiclesTanks", ["O_T_MBT_02_cannon_ghex_F"]] call _fnc_saveToTemplate; 
 ["vehiclesAA", ["O_T_APC_Tracked_02_AA_ghex_F"]] call _fnc_saveToTemplate;
 
@@ -52,7 +52,7 @@ private _vehiclesIFVs = ["a3a_O_T_APC_Tracked_02_cannon_ghex_F", "O_T_APC_Tracke
 ]] call _fnc_saveToTemplate;
 
 ["uavsAttack", ["O_T_UAV_04_CAS_F"]] call _fnc_saveToTemplate;
-["uavsPortable", ["O_T_UAV_01_F"]] call _fnc_saveToTemplate;
+["uavsPortable", ["O_UAV_01_F", "O_UAV_02_lxWS"]] call _fnc_saveToTemplate;
 
 //Config special vehicles - militia vehicles are mostly used in the early game, police cars are being used by troops around cities.
 private _vehiclesMilitiaLightArmed = ["O_T_LSV_02_armed_F","O_T_LSV_02_AT_F"];
@@ -74,13 +74,6 @@ private _vehiclesPolice = ["B_GEN_Offroad_01_gen_F"];
 ["minefieldAT", ["ATMine"]] call _fnc_saveToTemplate;
 ["minefieldAPERS", ["APERSMine"]] call _fnc_saveToTemplate;
 
-//If Western Sahara DLC
-if ("ws" in A3A_enabledDLC) then {
-    _cargoTrucks append ["O_T_Truck_02_cargo_lxWS","O_T_Truck_02_flatbed_lxWS"];
-    ["uavsPortable", ["O_UAV_01_F", "O_UAV_02_lxWS"]] call _fnc_saveToTemplate;
-    ["vehiclesLightAPCs", ["O_T_APC_Wheeled_02_hmg_lxWS", "O_T_APC_Wheeled_02_unarmed_lxWS"]] call _fnc_saveToTemplate;
-    _vehiclesIFVs append ["O_T_APC_Tracked_02_30mm_lxWS"];
-};
 if ("enoch" in A3A_enabledDLC) then {
     _vehiclesPolice append ["B_GEN_Offroad_01_comms_F","B_GEN_Offroad_01_covered_F"];
 };
@@ -99,9 +92,6 @@ if ("rf" in A3A_enabledDLC) then {
 ["vehiclesMilitiaCars", _vehiclesMilitiaCars] call _fnc_saveToTemplate;
 ["vehiclesMilitiaLightArmed", _vehiclesMilitiaLightArmed] call _fnc_saveToTemplate;
 ["vehiclesPolice", _vehiclesPolice] call _fnc_saveToTemplate;
-
-["vehiclesIFVs", _vehiclesIFVs] call _fnc_saveToTemplate;
-["vehiclesCargoTrucks", _cargoTrucks] call _fnc_saveToTemplate;
 
 #include "Aegis_Vehicle_Attributes.sqf"
 
@@ -307,7 +297,10 @@ _militaryLoadoutData set ["grenadeLaunchers", [
 ["arifle_CTAR_GL_blk_F", "", "acc_pointer_IR", "Aegis_optic_ROS", ["30Rnd_580x42_Mag_F", "30Rnd_580x42_Mag_F", "30Rnd_580x42_Mag_Tracer_F"], ["1Rnd_HE_Grenade_shell", "1Rnd_HE_Grenade_shell", "1Rnd_Smoke_Grenade_shell"], ""]
 ]];
 _militaryLoadoutData set ["shotGuns", [
-["sgun_Mp153_black_F", "", "Aegis_acc_pointer_compact_pistol_red", "", ["4Rnd_12Gauge_Pellets", "4Rnd_12Gauge_Slug"], [], ""]
+["sgun_Mp153_black_F", "", "Aegis_acc_pointer_compact_pistol_red", "", ["4Rnd_12Gauge_Pellets", "4Rnd_12Gauge_Slug"], [], ""],
+["sgun_aa40_lxWS", "", "acc_pointer_IR", "optic_Holosight_smg_blk_F", ["8Rnd_12Gauge_AA40_Pellets_lxWS", "8Rnd_12Gauge_AA40_Slug_lxWS"], [], ""],
+["sgun_aa40_lxWS", "", "acc_pointer_IR", "optic_Aco_smg", ["8Rnd_12Gauge_AA40_Pellets_lxWS", "8Rnd_12Gauge_AA40_Slug_lxWS"], [], ""],
+["sgun_aa40_lxWS", "", "acc_pointer_IR", "Aegis_optic_ROS_SMG", ["20Rnd_12Gauge_AA40_Pellets_lxWS", "20Rnd_12Gauge_AA40_Slug_lxWS"], [], ""]
 ]];
 _militaryLoadoutData set ["SMGs", [
 ["SMG_03C_TR_hex", "", "acc_pointer_IR", "optic_Holosight_smg_blk_F", [], [], ""],
@@ -445,13 +438,6 @@ if ("mark" in A3A_enabledDLC) then {
     ["srifle_DMR_05_ghex_F", "", "acc_pointer_IR", "optic_KHS_blk", [], [], "bipod_02_F_blk"],
     ["srifle_DMR_05_blk_F", "", "acc_pointer_IR", "optic_LRPS", [], [], "bipod_02_F_blk"]
     ];
-};
-if ("ws" in A3A_enabledDLC) then {
-	(_militaryLoadoutData get "shotGuns") append [
-	["sgun_aa40_lxWS", "", "acc_pointer_IR", "optic_Holosight_smg_blk_F", ["8Rnd_12Gauge_AA40_Pellets_lxWS", "8Rnd_12Gauge_AA40_Slug_lxWS"], [], ""],
-	["sgun_aa40_lxWS", "", "acc_pointer_IR", "optic_Aco_smg", ["8Rnd_12Gauge_AA40_Pellets_lxWS", "8Rnd_12Gauge_AA40_Slug_lxWS"], [], ""],
-	["sgun_aa40_lxWS", "", "acc_pointer_IR", "Aegis_optic_ROS_SMG", ["20Rnd_12Gauge_AA40_Pellets_lxWS", "20Rnd_12Gauge_AA40_Slug_lxWS"], [], ""]
-	];
 };
 if ("rf" in A3A_enabledDLC) then {
     (_sfLoadoutData get "slRifles") append [

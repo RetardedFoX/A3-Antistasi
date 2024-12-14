@@ -21,7 +21,7 @@
 ["vehiclesLightUnarmed", ["I_MRAP_03_F"]] call _fnc_saveToTemplate;
 private _lightArmed = ["I_MRAP_03_hmg_F", "I_MRAP_03_gmg_F"];
 ["vehiclesTrucks", ["I_Truck_02_transport_F", "I_Truck_02_covered_F"]] call _fnc_saveToTemplate;
-private _cargoTrucks = ["I_Truck_02_transport_F", "I_Truck_02_covered_F"];
+["vehiclesCargoTrucks", ["I_Truck_02_transport_F", "I_Truck_02_covered_F", "I_Truck_02_flatbed_lxWS", "I_Truck_02_cargo_lxWS"]] call _fnc_saveToTemplate;
 ["vehiclesAmmoTrucks", ["I_Truck_02_ammo_F"]] call _fnc_saveToTemplate;
 ["vehiclesRepairTrucks", ["I_Truck_02_box_F"]] call _fnc_saveToTemplate;
 ["vehiclesFuelTrucks", ["I_Truck_02_fuel_F"]] call _fnc_saveToTemplate;
@@ -30,7 +30,7 @@ private _cargoTrucks = ["I_Truck_02_transport_F", "I_Truck_02_covered_F"];
 ["vehiclesAPCs", ["I_APC_tracked_03_cannon_v2_F", "I_APC_Wheeled_03_cannon_F", "I_APC_Wheeled_03_cannon_F"]] call _fnc_saveToTemplate;;
 ["vehiclesIFVs", ["a3a_I_APC_tracked_03_cannon_v2_F", "a3a_APC_Wheeled_03_cannon_F"]] call _fnc_saveToTemplate;
 ["vehiclesTanks", ["I_MBT_03_cannon_F"]] call _fnc_saveToTemplate;
-private _AA = ["I_LT_01_AA_F"];
+["vehiclesAA", ["I_LT_01_AA_F", "I_A_Truck_02_aa_lxWS"]] call _fnc_saveToTemplate;
 
 ["vehiclesTransportBoats", ["I_Boat_Transport_01_F"]] call _fnc_saveToTemplate;
 ["vehiclesGunBoats", ["I_Boat_Armed_01_minigun_F"]] call _fnc_saveToTemplate;
@@ -52,7 +52,7 @@ private _vehiclesHelisAttack = ["I_Heli_Attack_03_F"];
 ]] call _fnc_saveToTemplate;
 
 ["uavsAttack", ["I_UAV_02_dynamicLoadout_F"]] call _fnc_saveToTemplate;
-["uavsPortable", ["I_UAV_01_F"]] call _fnc_saveToTemplate;
+["uavsPortable", ["I_UAV_01_F", "I_UAV_02_lxWS"]] call _fnc_saveToTemplate;
 
 //Config special vehicles - militia vehicles are mostly used in the early game, police cars are being used by troops around cities.
 private _vehiclesMilitiaLightArmed = ["a3a_Offroad_01_green_armed_F", "a3a_Offroad_01_green_AT_F"];
@@ -78,11 +78,6 @@ if ("tanks" in A3A_enabledDLC) then {
 	// No seats so can't be APC, too weak to be IFV ;-;
     _lightArmed append ["I_LT_01_AT_F", "I_LT_01_cannon_F"];
 };
-if ("ws" in A3A_enabledDLC) then {
-	_cargoTrucks = ["I_Truck_02_flatbed_lxWS", "I_Truck_02_cargo_lxWS"];
-	_AA append ["I_A_Truck_02_aa_lxWS"];
-    ["uavsPortable", ["I_UAV_01_F", "I_UAV_02_lxWS"]] call _fnc_saveToTemplate;
-};
 if ("enoch" in A3A_enabledDLC) then {
     _vehiclesMilitiaCars append ["a3a_Offroad_01_comms_green_F", "a3a_Offroad_01_covered_green_F"];
     _vehiclesPolice append ["B_GEN_Offroad_01_comms_F","B_GEN_Offroad_01_covered_F"];
@@ -106,9 +101,7 @@ if ("rf" in A3A_enabledDLC) then {
 ["vehiclesHelisAttack", _vehiclesHelisAttack] call _fnc_saveToTemplate;
 ["vehiclesPolice", _vehiclesPolice] call _fnc_saveToTemplate;
 
-["vehiclesCargoTrucks", _cargoTrucks] call _fnc_saveToTemplate;
 ["vehiclesLightArmed", _lightArmed] call _fnc_saveToTemplate;
-["vehiclesAA", _AA] call _fnc_saveToTemplate;
 
 ["vehiclesMilitiaCars", _vehiclesMilitiaCars] call _fnc_saveToTemplate;
 ["vehiclesMilitiaLightArmed", _vehiclesMilitiaLightArmed] call _fnc_saveToTemplate;

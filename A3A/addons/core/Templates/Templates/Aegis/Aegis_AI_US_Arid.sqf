@@ -27,9 +27,9 @@ private _LightArmed = ["B_MRAP_01_hmg_F", "B_MRAP_01_hmg_F", "B_MRAP_01_gmg_F"];
 ["vehiclesFuelTrucks", ["B_Truck_01_fuel_F"]] call _fnc_saveToTemplate;
 ["vehiclesMedical", ["B_Truck_01_medical_F", "B_APC_Wheeled_01_medical_F"]] call _fnc_saveToTemplate;
 ["vehiclesLightAPCs", []] call _fnc_saveToTemplate;
-private _APCs = ["B_APC_Wheeled_01_cannon_v2_F", "B_APC_Tracked_01_rcws_F"];
+["vehiclesAPCs", ["B_APC_Wheeled_01_cannon_v2_F", "B_APC_Tracked_01_rcws_F", "B_APC_Wheeled_01_atgm_lxWS_v2", "a3a_APC_Wheeled_01_command_lxWS"]] call _fnc_saveToTemplate;
 ["vehiclesIFVs", ["a3a_B_APC_Wheeled_01_cannon_v2_F"]] call _fnc_saveToTemplate;
-private _Tanks = ["B_MBT_01_TUSK_F", "B_MBT_01_cannon_F"];
+["vehiclesTanks", ["B_MBT_01_TUSK_F", "B_MBT_01_cannon_F"]] call _fnc_saveToTemplate;
 ["vehiclesAA", ["B_APC_Tracked_01_AA_F"]] call _fnc_saveToTemplate;
 
 ["vehiclesTransportBoats", ["B_Boat_Transport_01_F"]] call _fnc_saveToTemplate;
@@ -52,7 +52,7 @@ private _vehiclesHelisLightAttack = ["B_Heli_Light_01_dynamicLoadout_F"];
 ]] call _fnc_saveToTemplate;
 
 ["uavsAttack", ["B_UAV_02_dynamicLoadout_F", "B_UAV_05_F"]] call _fnc_saveToTemplate;
-["uavsPortable", ["B_UAV_01_F"]] call _fnc_saveToTemplate;
+["uavsPortable", ["B_UAV_01_F", "B_UAV_02_lxWS"]] call _fnc_saveToTemplate;
 
 //Config special vehicles - militia vehicles are mostly used in the early game, police cars are being used by troops around cities -- Example:
 private _vehiclesMilitiaLightArmed = ["a3a_Offroad_01_tan_armed_F", "a3a_Offroad_01_tan_AT_F"];
@@ -74,11 +74,6 @@ private _vehiclesPolice = ["B_GEN_Offroad_01_gen_F"];
 ["minefieldAT", ["ATMine"]] call _fnc_saveToTemplate;
 ["minefieldAPERS", ["APERSMine"]] call _fnc_saveToTemplate;
 
-//If Western Sahara DLC
-if ("ws" in A3A_enabledDLC) then {
-    _APCs append ["B_APC_Wheeled_01_atgm_lxWS_v2", "a3a_APC_Wheeled_01_command_lxWS"];
-    ["uavsPortable", ["B_UAV_01_F", "B_UAV_02_lxWS"]] call _fnc_saveToTemplate;
-};
 if ("enoch" in A3A_enabledDLC) then {
     _vehiclesPolice append ["B_GEN_Offroad_01_comms_F","B_GEN_Offroad_01_covered_F"];
     _vehiclesMilitiaCars append ["a3a_Offroad_01_comms_tan_F", "a3a_Offroad_01_covered_tan_F"];
@@ -108,8 +103,6 @@ if ("rf" in A3A_enabledDLC) then {
 
 ["vehiclesLightUnarmed", _LightUnarmed] call _fnc_saveToTemplate;
 ["vehiclesLightArmed", _LightArmed] call _fnc_saveToTemplate;
-["vehiclesAPCs", _APCs] call _fnc_saveToTemplate;
-["vehiclesTanks", _Tanks] call _fnc_saveToTemplate;
 
 ["vehiclesHelisLight", _vehiclesHelisLight] call _fnc_saveToTemplate;
 ["vehiclesHelisLightAttack", _vehiclesHelisLightAttack] call _fnc_saveToTemplate;
